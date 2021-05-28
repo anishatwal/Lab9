@@ -46,7 +46,6 @@
     <button>Console Error Demo</button>
     <button>Console Dir</button>
     <button>Console dirxml</button>
-    <button>Console Error</button>
     <button>Console Group Start</button>
     <button>Console Group End</button>
     <button>Console Table</button>
@@ -56,6 +55,14 @@
     <button>Trigger a Global Error</button>
   </section>
 
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "78f40b074c8e43bb9ee696dbc0a2a933"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>
+
   <script>
     let calculateBtn = document.querySelector('#calculate');
     calculateBtn.addEventListener('click', () => {
@@ -63,11 +70,88 @@
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      //output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+
+      // Trying Try/Catch
+      let result;
+      try {
+        if (operator == '/' && secondNum == 0) {
+          result = 'undefined';
+          throw new UndefinedResultError("cannot divide by 0");
+        }
+        result = eval(`${firstNum} ${operator} ${secondNum}`); 
+      } catch(err) {
+        console.error(err.name + ": " + err.message);
+      } finally {
+        output.innerHTML = result;
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
     // TODO - Make buttons functional
+    // Console Log Demo
+    errorBtns[0].addEventListener('click', () => {
+      console.log(errorBtns[0].innerHTML);
+    });
+    // Console Error Demo
+    errorBtns[1].addEventListener('click', () => {
+      console.error(errorBtns[1].innerHTML);
+    });
+    // Console Dir
+    errorBtns[2].addEventListener('click', () => {
+      console.dir(errorBtns[2]);
+    });
+    // Console dirxml
+    errorBtns[3].addEventListener('click', () => {
+      console.dirxml(document.querySelector("body"));
+    });
+    // Console Group Start
+    errorBtns[4].addEventListener('click', () => {
+      console.group('Log Group');
+    });
+    // Console Group End
+    errorBtns[5].addEventListener('click', () => {
+      console.groupEnd('Log Group');
+    });
+    // Console Table
+    errorBtns[6].addEventListener('click', () => {
+      console.table(errorBtns);
+    });
+    // Start Timer
+    errorBtns[7].addEventListener('click', () => {
+      console.log('Timer Started!');
+      console.time();
+    });
+    // End Timer
+    errorBtns[8].addEventListener('click', () => {
+      console.log('Timer Ended!');
+      console.timeEnd();
+    });
+    // Console Trace
+    errorBtns[9].addEventListener('click', () => {
+      const deep = () => { deeper(); };
+      const deeper = () => { deepest(); };
+      const deepest = () => { console.trace(); };
+      deep();
+    });
+    // Trigger a Global Error
+    errorBtns[10].addEventListener('click', () => {
+      boom;
+    });
+
+    // Throw and Custom Errors (thrown in try/catch)
+    class UndefinedResultError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = 'UndefinedResultError';
+      }
+    }
+
+    // The Global Error handler and 3rd Party Tracking (first script tags)
+    window.onerror = function() {
+      console.log("global error handler");
+    }
+    TrackJS.track('Testing TrackJS!');
   </script>
 </body>
 </html>
